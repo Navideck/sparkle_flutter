@@ -22,6 +22,16 @@ class SparkleFlutter {
   static Future<void> setAutomaticallyDownloadsUpdates(bool value) =>
       _channel.automaticallyDownloadsUpdates(value);
 
+  static Future<void> addUpdateCheckOptionInAppMenu({
+    String? title,
+    String? menuName,
+  }) {
+    return _channel.addUpdateCheckOptionInAppMenu(
+      title: title,
+      menuName: menuName,
+    );
+  }
+
   static void setListener(SparkleFlutterCallbackChannel? channel) {
     SparkleFlutterCallbackChannel.setUp(channel);
   }

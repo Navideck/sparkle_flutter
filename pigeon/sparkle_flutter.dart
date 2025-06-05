@@ -21,6 +21,7 @@ abstract class SparkleFlutterChannel {
   void automaticallyDownloadsUpdates(bool automaticallyDownloads);
   bool canCheckForUpdates();
   bool sessionInProgress();
+  void addUpdateCheckOptionInAppMenu({String? title, String? menuName});
 }
 
 /// Native -> Flutter

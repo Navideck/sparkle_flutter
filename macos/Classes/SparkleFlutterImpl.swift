@@ -19,7 +19,7 @@
             super.init()
         }
 
-        public func feedURLString(for updater: SPUUpdater) -> String? {
+        public func feedURLString(for _: SPUUpdater) -> String? {
             return feedURL?.absoluteString
         }
 
@@ -36,7 +36,7 @@
             if feedUrl != nil {
                 feedURL = URL(string: feedUrl!)
             }
-            
+
             do {
                 try _updater?.start()
             } catch {
@@ -63,7 +63,7 @@
         func checkForUpdates(inBackground: Bool?) throws {
             if _updater?.sessionInProgress == true {
                 throw PigeonError(code: "SessionInProgress", message: "Session Already in progress, check for update later", details: nil)
-            }            
+            }
             if inBackground == true {
                 _updater?.checkForUpdatesInBackground()
             } else {
@@ -73,6 +73,50 @@
 
         func setScheduledCheckInterval(interval: Int64) throws {
             _updater?.updateCheckInterval = TimeInterval(interval)
+        }
+
+        func addUpdateCheckOptionInAppMenu(title: String?, menuName: String?) throws {
+            guard let mainMenu = NSApp.mainMenu else {
+                throw PigeonError(code: "NoMenuAvailable", message: "NoMenu available", details: nil)
+            }
+
+            let updateTitle = title ?? "Check For Updates"
+            let checkForUpdateItem = NSMenuItem(
+                title: updateTitle,
+                action: #selector(checkForUpdateFromMenu),
+                keyEquivalent: "u"
+            )
+            checkForUpdateItem.target = self
+
+            if let menuName = menuName {
+                if let existingMenuItem = mainMenu.items.first(where: {
+                    $0.submenu?.title == menuName
+                }) {
+                    if let submenu = existingMenuItem.submenu,
+                       submenu.items.contains(where: { $0.title == updateTitle }) {
+                        return
+                    }
+                    existingMenuItem.submenu?.addItem(checkForUpdateItem)
+                } else {
+                    let customMenuItem = NSMenuItem()
+                    let customMenu = NSMenu(title: menuName)
+                    customMenu.addItem(checkForUpdateItem)
+                    customMenuItem.submenu = customMenu
+                    mainMenu.addItem(customMenuItem)
+                }
+            } else if let appMenuItem = mainMenu.items.first,
+                      let appMenu = appMenuItem.submenu {
+                if appMenu.items.contains(where: { $0.title == updateTitle }) {
+                    return 
+                }
+                appMenu.insertItem(checkForUpdateItem, at: 1)
+            } else {
+                throw PigeonError(code: "AppMenuNotFound", message: "NoMenu available", details: nil)
+            }
+        }
+
+        @objc func checkForUpdateFromMenu() {
+            _updater?.checkForUpdates()
         }
 
         // SPUUpdaterDelegate

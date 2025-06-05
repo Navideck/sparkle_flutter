@@ -24,9 +24,14 @@ class _MyAppState extends State<MyApp>
 
   @override
   void initState() {
-    SparkleFlutter.setListener(this);
-    SparkleFlutter.initialize(feedUrl: feedUrl);
+    _setup();
     super.initState();
+  }
+
+  void _setup() async {
+    SparkleFlutter.setListener(this);
+    await SparkleFlutter.initialize(feedUrl: feedUrl);
+    await SparkleFlutter.addUpdateCheckOptionInAppMenu();
   }
 
   void _addLogs(log) {

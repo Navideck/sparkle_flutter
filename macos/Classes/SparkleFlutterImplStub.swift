@@ -28,4 +28,8 @@ class SparkleFlutterImplStub: NSObject, SparkleFlutterChannel {
     func setScheduledCheckInterval(interval _: Int64) throws {
         throw notImportedError
     }
+    
+    func addUpdateCheckOptionInAppMenu(title: String?, menuName: String?) throws {
+        throw notImportedError
+    }
 }

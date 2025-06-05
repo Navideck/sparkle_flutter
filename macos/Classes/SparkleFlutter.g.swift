@@ -309,6 +309,7 @@ protocol SparkleFlutterChannel {
   func automaticallyDownloadsUpdates(automaticallyDownloads: Bool) throws
   func canCheckForUpdates() throws -> Bool
   func sessionInProgress() throws -> Bool
+  func addUpdateCheckOptionInAppMenu(title: String?, menuName: String?) throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -417,6 +418,22 @@ class SparkleFlutterChannelSetup {
       }
     } else {
       sessionInProgressChannel.setMessageHandler(nil)
+    }
+    let addUpdateCheckOptionInAppMenuChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.universal_ble.SparkleFlutterChannel.addUpdateCheckOptionInAppMenu\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      addUpdateCheckOptionInAppMenuChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let titleArg: String? = nilOrValue(args[0])
+        let menuNameArg: String? = nilOrValue(args[1])
+        do {
+          try api.addUpdateCheckOptionInAppMenu(title: titleArg, menuName: menuNameArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      addUpdateCheckOptionInAppMenuChannel.setMessageHandler(nil)
     }
   }
 }
