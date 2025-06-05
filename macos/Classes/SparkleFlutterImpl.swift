@@ -17,7 +17,13 @@
         init(callbackChannel: SparkleFlutterCallbackChannel) {
             self.callbackChannel = callbackChannel
             super.init()
+        }
 
+        public func feedURLString(for updater: SPUUpdater) -> String? {
+            return feedURL?.absoluteString
+        }
+
+        func initialize(feedUrl: String?) throws {
             let hostBundle = Bundle.main
             _userDriver = SPUStandardUserDriver(hostBundle: hostBundle, delegate: self)
             _updater = SPUUpdater(
@@ -27,15 +33,37 @@
                 delegate: self
             )
             _updater?.clearFeedURLFromUserDefaults()
-            try? _updater?.start()
+            if feedUrl != nil {
+                feedURL = URL(string: feedUrl!)
+            }
+            
+            do {
+                try _updater?.start()
+            } catch {
+                throw PigeonError(code: "Failed", message: error.localizedDescription, details: nil)
+            }
         }
 
-        func setFeedURL(url: String) {
-            feedURL = URL(string: url)
-            try? _updater?.start()
+        func automaticallyDownloadsUpdates(automaticallyDownloads: Bool) throws {
+            _updater?.automaticallyDownloadsUpdates = automaticallyDownloads
         }
 
-        func checkForUpdates(inBackground: Bool?) {
+        func automaticallyChecksForUpdates(automaticallyChecks: Bool) throws {
+            _updater?.automaticallyDownloadsUpdates = automaticallyChecks
+        }
+
+        func canCheckForUpdates() throws -> Bool {
+            return _updater?.canCheckForUpdates ?? false
+        }
+
+        func sessionInProgress() throws -> Bool {
+            return _updater?.sessionInProgress ?? false
+        }
+
+        func checkForUpdates(inBackground: Bool?) throws {
+            if _updater?.sessionInProgress == true {
+                throw PigeonError(code: "SessionInProgress", message: "Session Already in progress, check for update later", details: nil)
+            }            
             if inBackground == true {
                 _updater?.checkForUpdatesInBackground()
             } else {
@@ -43,7 +71,7 @@
             }
         }
 
-        func setScheduledCheckInterval(interval: Int64) {
+        func setScheduledCheckInterval(interval: Int64) throws {
             _updater?.updateCheckInterval = TimeInterval(interval)
         }
 
@@ -71,6 +99,10 @@
         public func updater(_: SPUUpdater, willInstallUpdateOnQuit item: SUAppcastItem, immediateInstallationBlock _: @escaping () -> Void) -> Bool {
             callbackChannel.onUpdaterBeforeQuitForUpdate(appcastItem: item.toAppCastItem()) { _ in }
             return true
+        }
+
+        public func updater(_: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: (any Error)?) {
+            callbackChannel.onUpdateDidFinishUpdateCycle(event: updateCheck.toUpdateCheckEvent(), error: error?.localizedDescription) { _ in }
         }
     }
 
@@ -102,6 +134,18 @@
                 maximumOperatingSystemVersionIsOK: maximumOperatingSystemVersionIsOK,
                 channel: channel ?? ""
             )
+        }
+    }
+
+    extension SPUUpdateCheck {
+        func toUpdateCheckEvent() -> UpdateCheckEvent {
+            if rawValue == 1 {
+                return .checkUpdatesInBackground
+            }
+            if rawValue == 2 {
+                return .checkUpdateInformation
+            }
+            return .checkUpdates
         }
     }
 #endif

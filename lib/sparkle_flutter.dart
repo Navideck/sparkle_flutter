@@ -2,4 +2,4 @@ library;
 
 export 'package:sparkle_flutter/src/sparkle_flutter.dart';
 export 'package:sparkle_flutter/src/sparkle_flutter.g.dart'
-    show Appcast, AppcastItem;
+    show SparkleFlutterCallbackChannel, Appcast, AppcastItem, UpdateCheckEvent;

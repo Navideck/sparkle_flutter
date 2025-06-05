@@ -14,9 +14,13 @@ import 'package:pigeon/pigeon.dart';
 /// Flutter -> Native
 @HostApi()
 abstract class SparkleFlutterChannel {
-  void setFeedURL(String url);
+  void initialize({String? feedUrl});
   void checkForUpdates({bool? inBackground});
   void setScheduledCheckInterval(int interval);
+  void automaticallyChecksForUpdates(bool automaticallyChecks);
+  void automaticallyDownloadsUpdates(bool automaticallyDownloads);
+  bool canCheckForUpdates();
+  bool sessionInProgress();
 }
 
 /// Native -> Flutter
@@ -28,6 +32,7 @@ abstract class SparkleFlutterCallbackChannel {
   void onUpdaterUpdateNotAvailable(String? error);
   void onUpdaterUpdateDownloaded(AppcastItem? appcastItem);
   void onUpdaterBeforeQuitForUpdate(AppcastItem? appcastItem);
+  void onUpdateDidFinishUpdateCycle(UpdateCheckEvent event, String? error);
 }
 
 class Appcast {
@@ -71,4 +76,10 @@ class AppcastItem {
     this.maximumOperatingSystemVersionIsOK,
     this.channel,
   });
+}
+
+enum UpdateCheckEvent {
+  checkUpdates,
+  checkUpdatesInBackground,
+  checkUpdateInformation,
 }

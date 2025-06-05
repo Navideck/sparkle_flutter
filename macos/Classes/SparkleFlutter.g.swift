@@ -132,6 +132,12 @@ func deepHashSparkleFlutter(value: Any?, hasher: inout Hasher) {
 
     
 
+enum UpdateCheckEvent: Int {
+  case checkUpdates = 0
+  case checkUpdatesInBackground = 1
+  case checkUpdateInformation = 2
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct Appcast: Hashable {
   var items: [AppcastItem]
@@ -246,8 +252,14 @@ private class SparkleFlutterPigeonCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
     case 129:
-      return Appcast.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return UpdateCheckEvent(rawValue: enumResultAsInt)
+      }
+      return nil
     case 130:
+      return Appcast.fromList(self.readValue() as! [Any?])
+    case 131:
       return AppcastItem.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -257,11 +269,14 @@ private class SparkleFlutterPigeonCodecReader: FlutterStandardReader {
 
 private class SparkleFlutterPigeonCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? Appcast {
+    if let value = value as? UpdateCheckEvent {
       super.writeByte(129)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? Appcast {
+      super.writeByte(130)
       super.writeValue(value.toList())
     } else if let value = value as? AppcastItem {
-      super.writeByte(130)
+      super.writeByte(131)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -287,9 +302,13 @@ class SparkleFlutterPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendabl
 ///
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol SparkleFlutterChannel {
-  func setFeedURL(url: String) throws
+  func initialize(feedUrl: String?) throws
   func checkForUpdates(inBackground: Bool?) throws
   func setScheduledCheckInterval(interval: Int64) throws
+  func automaticallyChecksForUpdates(automaticallyChecks: Bool) throws
+  func automaticallyDownloadsUpdates(automaticallyDownloads: Bool) throws
+  func canCheckForUpdates() throws -> Bool
+  func sessionInProgress() throws -> Bool
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -298,20 +317,20 @@ class SparkleFlutterChannelSetup {
   /// Sets up an instance of `SparkleFlutterChannel` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: SparkleFlutterChannel?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-    let setFeedURLChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.universal_ble.SparkleFlutterChannel.setFeedURL\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let initializeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.universal_ble.SparkleFlutterChannel.initialize\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      setFeedURLChannel.setMessageHandler { message, reply in
+      initializeChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let urlArg = args[0] as! String
+        let feedUrlArg: String? = nilOrValue(args[0])
         do {
-          try api.setFeedURL(url: urlArg)
+          try api.initialize(feedUrl: feedUrlArg)
           reply(wrapResult(nil))
         } catch {
           reply(wrapError(error))
         }
       }
     } else {
-      setFeedURLChannel.setMessageHandler(nil)
+      initializeChannel.setMessageHandler(nil)
     }
     let checkForUpdatesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.universal_ble.SparkleFlutterChannel.checkForUpdates\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
@@ -343,6 +362,62 @@ class SparkleFlutterChannelSetup {
     } else {
       setScheduledCheckIntervalChannel.setMessageHandler(nil)
     }
+    let automaticallyChecksForUpdatesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.universal_ble.SparkleFlutterChannel.automaticallyChecksForUpdates\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      automaticallyChecksForUpdatesChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let automaticallyChecksArg = args[0] as! Bool
+        do {
+          try api.automaticallyChecksForUpdates(automaticallyChecks: automaticallyChecksArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      automaticallyChecksForUpdatesChannel.setMessageHandler(nil)
+    }
+    let automaticallyDownloadsUpdatesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.universal_ble.SparkleFlutterChannel.automaticallyDownloadsUpdates\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      automaticallyDownloadsUpdatesChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let automaticallyDownloadsArg = args[0] as! Bool
+        do {
+          try api.automaticallyDownloadsUpdates(automaticallyDownloads: automaticallyDownloadsArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      automaticallyDownloadsUpdatesChannel.setMessageHandler(nil)
+    }
+    let canCheckForUpdatesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.universal_ble.SparkleFlutterChannel.canCheckForUpdates\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      canCheckForUpdatesChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.canCheckForUpdates()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      canCheckForUpdatesChannel.setMessageHandler(nil)
+    }
+    let sessionInProgressChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.universal_ble.SparkleFlutterChannel.sessionInProgress\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      sessionInProgressChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.sessionInProgress()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      sessionInProgressChannel.setMessageHandler(nil)
+    }
   }
 }
 /// Native -> Flutter
@@ -355,6 +430,7 @@ protocol SparkleFlutterCallbackChannelProtocol {
   func onUpdaterUpdateNotAvailable(error errorArg: String?, completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onUpdaterUpdateDownloaded(appcastItem appcastItemArg: AppcastItem?, completion: @escaping (Result<Void, PigeonError>) -> Void)
   func onUpdaterBeforeQuitForUpdate(appcastItem appcastItemArg: AppcastItem?, completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onUpdateDidFinishUpdateCycle(event eventArg: UpdateCheckEvent, error errorArg: String?, completion: @escaping (Result<Void, PigeonError>) -> Void)
 }
 class SparkleFlutterCallbackChannel: SparkleFlutterCallbackChannelProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -460,6 +536,24 @@ class SparkleFlutterCallbackChannel: SparkleFlutterCallbackChannelProtocol {
     let channelName: String = "dev.flutter.pigeon.universal_ble.SparkleFlutterCallbackChannel.onUpdaterBeforeQuitForUpdate\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([appcastItemArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(PigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(()))
+      }
+    }
+  }
+  func onUpdateDidFinishUpdateCycle(event eventArg: UpdateCheckEvent, error errorArg: String?, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.universal_ble.SparkleFlutterCallbackChannel.onUpdateDidFinishUpdateCycle\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([eventArg, errorArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return
