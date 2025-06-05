@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp>
                   const SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () {
-                      SparkleFlutter.automaticallyChecksForUpdates = true;
+                      SparkleFlutter.setAutomaticallyChecksForUpdates(true);
                     },
                     child: const Text("Set AutomaticallyChecksForUpdates"),
                   ),
