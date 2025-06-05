@@ -1,17 +1,11 @@
 PODS:
   - FlutterMacOS (1.0.0)
-  - Sparkle (2.7.0)
   - sparkle_flutter (0.0.1):
     - FlutterMacOS
-    - Sparkle
 
 DEPENDENCIES:
   - FlutterMacOS (from `Flutter/ephemeral`)
   - sparkle_flutter (from `Flutter/ephemeral/.symlinks/plugins/sparkle_flutter/macos`)
-
-SPEC REPOS:
-  trunk:
-    - Sparkle
 
 EXTERNAL SOURCES:
   FlutterMacOS:
@@ -21,8 +15,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  Sparkle: 9c328bdcfbcaf8f030c4b678eadfd0fcb03822d8
-  sparkle_flutter: ff7b78cd254a465c01848ea2c09a2101870cee21
+  sparkle_flutter: 081e640233c1ede6fdf3a684ad5febc23704e52d
 
 PODFILE CHECKSUM: 75b906ae40964f17670c9a358c1a723ab34c5f97
 

@@ -9,7 +9,7 @@ By default Sparkle will not be part of your app, so you have to first set env `E
 After adding this plugin, either export `ENABLE_SPARKLE=1` to your terminal, or run all commands with this env,
 
 ```sh
-flutter clean
+flutter clean && flutter pub get
 cd macos
 ENABLE_SPARKLE=1 pod install
 ```
@@ -19,7 +19,7 @@ This will include the sparkle framework in your app
 To remove Sparkle framework, repeat these commands, without env
 
 ```sh
-flutter clean
+flutter clean && flutter pub get
 cd macos
 pod install
 ```
