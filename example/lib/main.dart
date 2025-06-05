@@ -19,7 +19,8 @@ class _MyAppState extends State<MyApp>
   List<String> logs = [];
 
   // Specify feed url first, and initialize with it
-  String feedUrl = "";
+  String feedUrl =
+      'https://raw.githubusercontent.com/Navideck/sparkle_flutter/main/appcast/sample_appcast.xml';
 
   @override
   void initState() {

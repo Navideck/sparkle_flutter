@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+    xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>SparkleFlutter - Appcast</title>
+        <item>
+            <title>Version 3.3.1</title>
+            <sparkle:shortVersionString>3.3.1</sparkle:shortVersionString>
+            <sparkle:version>107</sparkle:version>
+            <sparkle:releaseNotesLink>
+                "Release Notes"
+            </sparkle:releaseNotesLink>
+            <pubDate>Thu, 15/5/2025 12:43:16 +0000</pubDate>
+            <enclosure
+                url="UPDATE_URL"
+                sparkle:edSignature="CbIOj22NYJG6T4ny+8/fALGXp7WL6N4dt+QsyuKEy6DBsQ9djzygwhQLaBX3rbHnrLS+hAjk3p5Fe6RsoewDBA=="
+                sparkle:os="macos"
+                length="48300625"
+                type="application/octet-stream" />
+        </item>
+    </channel>
+</rss>
